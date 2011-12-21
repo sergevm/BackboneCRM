@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  legal_form: MyString
+  since: 2011-12-21
+
+two:
+  name: MyString
+  legal_form: MyString
+  since: 2011-12-21
