@@ -7,6 +7,11 @@ gem 'rails', '3.1.1'
 
 gem 'sqlite3'
 
+gem 'rake', '0.8.7'
+
+gem 'win32-open3-19'
+
+gem 'jammit'
 
 # Gems used only for assets and not required
 # in production environments by default.

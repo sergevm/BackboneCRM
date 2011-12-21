@@ -1,0 +1,10 @@
+package_assets: off
+javascripts:
+  app:
+    - public/javascripts/jquery.js
+    - public/javascripts/underscore.js
+    - public/javascripts/backbone.js
+    - public/javascripts/application.js
+    - public/javascripts/models/*.js
+    - public/javascripts/**/*.js
+    - app/views/**/*.jst
