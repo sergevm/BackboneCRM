@@ -1,8 +1,11 @@
 App.Views.Customers = Backbone.View.extend({
 
-  tagName: 'ul',
+  tagName: 'table',
+
+  className: 'customer-table', 
   
    template: "\
+      <% $(list.el).append('<tr><th class=customer-header>Company</th><th class=customer-header>Legal Form</th></tr>'); %>\
       <% _.each(customers, function(customer) { %>\
           <% $(list.el).append(render_customer(customer)) %>\
       <% }) %>",
@@ -30,14 +33,16 @@ App.Views.Customers = Backbone.View.extend({
 
 App.Views.Customer = Backbone.View.extend({
   
-  tagName: 'li',
+  tagName: 'tr',
+
+  className: 'customer-row',
+
+  template: "\
+    <td class='customer-cell'><%= customer.name %></td>&nbsp;<td class='customer-cell'><%= customer.legal_form %></td>",
 
   render: function() {
-    $(this.el).html(this.template(this.model.attributes));
-    return this;
-  },
-
-  template: _.template('<span style="width:180"><%= name %></span>&nbsp;<span><%= legal_form %></span>')
+    return $(this.el).html(_.template(this.template, {customer: this.model.attributes}));
+  }
 });
 
 

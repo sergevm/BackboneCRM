@@ -1,3 +1,21 @@
 // Place all the styles related to the customers controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.customer-table {
+  border: 1px solid black;
+}
+
+.customer-row {
+  border: 1px dashed red;
+  padding: 1px;
+}
+.customer-header {
+  background:darkgreen;
+  color: white;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align:center;
+}
+.customer-cell {
+  text-align: center;
+}
