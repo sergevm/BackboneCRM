@@ -8,6 +8,7 @@
 .customer-row {
   border: 1px dashed red;
   padding: 1px;
+  background:yellow;
 }
 .customer-header {
   background:darkgreen;
@@ -18,4 +19,14 @@
 }
 .customer-cell {
   text-align: center;
+}
+.customer-name {
+  color: red;
+  width: 400px;
+  text-align:left;
+}
+.message {
+  color: red;
+  height: 30;
+  margin: 20;
 }

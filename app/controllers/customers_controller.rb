@@ -77,7 +77,7 @@ class CustomersController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to customers_url }
-      format.json { head :ok }
+      format.json { render json: @customer, head: :ok }
     end
   end
 end

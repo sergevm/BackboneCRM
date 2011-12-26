@@ -1,5 +1,11 @@
 App.Models.Customer = Backbone.Model.extend({
-  urlRoot: 'customers'
+  url:function() {
+    if(this.isNew()) {
+      return '/customers';
+    }
+
+    return '/customers/' + this.id;
+  }
 });
 
 App.Models.Customers = Backbone.Collection.extend({

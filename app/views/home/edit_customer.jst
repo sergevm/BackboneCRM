@@ -1,0 +1,7 @@
+<form id='customer-form' method='POST'>
+  <label for='name'>Name</label>
+  <input name='name' type='text'/>
+  <label for='legal_form'>Legal Form</label>
+  <input name='legal_form' type='text'/>
+  <button><%= model.isNew() ? 'Create' : 'Save' %></button>
+</form>
