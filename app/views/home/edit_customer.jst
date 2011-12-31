@@ -1,7 +1,8 @@
 <form id='customer-form' method='POST'>
   <label for='name'>Name</label>
-  <input name='name' type='text'/>
+  <input name='name' type='text' value='<%= model.get('name') %>'/>
   <label for='legal_form'>Legal Form</label>
-  <input name='legal_form' type='text'/>
+  <input name='legal_form' type='text' value='<%= model.get('legal_form') %>'/>
   <button><%= model.isNew() ? 'Create' : 'Save' %></button>
+  <input type="button" value="Cancel" id="cancelButton" />
 </form>

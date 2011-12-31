@@ -21,7 +21,14 @@ App.Views.Customers = Backbone.View.extend({
 
   add: function(customer) {
 
+    var list = this;
+
     var view = new App.Views.Customer({model: customer});
+    
+    view.bind("edit", function(customer){
+     list.trigger("edit", customer); 
+    }, view);
+    
     this.$("#customer-table-body").append(view.el);
 
   },
@@ -37,10 +44,10 @@ App.Views.Customers = Backbone.View.extend({
 
   addAll: function() {
     
-    this.collection.each(this.add);
+    this.collection.each(this.add, this);
 
   }
-
+    
 });
 
 App.Views.Customer = Backbone.View.extend({
@@ -69,7 +76,7 @@ App.Views.Customer = Backbone.View.extend({
   },
 
   edit: function() {
-    console.log("model - edit");
+   this.trigger("edit", this.model); 
   },
 
   remove: function(ev) {
@@ -91,7 +98,8 @@ App.Views.Customer = Backbone.View.extend({
 App.Views.EditCustomer = Backbone.View.extend({
 
   events: {
-    "submit #customer-form"             :"save"
+    "submit #customer-form"             :"save",
+    "click input:button"                :"cancel"
   },
 
   initialize: function() {
@@ -107,24 +115,32 @@ App.Views.EditCustomer = Backbone.View.extend({
 
   },
 
-  save: function(event) {
+  save: function(ev) {
 
     var el = this.el;
+    var isNew = this.model.isNew();
 
     this.model.save({name: this.$("[name=name]").val(), 
       legal_form: this.$("[name=legal_form]").val()},
       {
         success: function(model,response){
-          model.trigger("saved");
+          model.trigger(isNew ? "created": "updated");
           el.unbind();
         },
         error: function() {
-        
         }
       }
     );
 
-    event.preventDefault(); 
+    ev.preventDefault(); 
+  },
+
+  cancel: function(){
+    
+    this.el.unbind();
+    this.el.empty();
+    this.trigger("cancel");
+
   }
 
 });

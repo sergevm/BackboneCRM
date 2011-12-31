@@ -4,7 +4,7 @@ App.Routers.Customers = Backbone.Router.extend({
     "":                         "index",
     "customers":                "index",
     "customers/create":         "create",
-    "customers/:id":            "get",
+    "customers/:id":            "edit",
     "customers/delete/:id":     "remove"
   },
 
@@ -12,8 +12,15 @@ App.Routers.Customers = Backbone.Router.extend({
 
   index: function() {
 
+    var router = this;
+    
     var view = new App.Views.Customers({el: $("#content"), collection: this.customers});
+
     this.clearMessage();
+
+    view.bind("edit", function(customer) {
+      router.edit(customer);
+    });
 
     this.navigate("customers");
 
@@ -27,13 +34,36 @@ App.Routers.Customers = Backbone.Router.extend({
 
     var view = new App.Views.EditCustomer({el: $("#subcontent"), model: model});
 
+    view.bind("cancel", function() {
+      
+      router.displayMessage("Addition of customer was cancelled");
+      router.navigate("customers");
+
+    });
+
     this.clearMessage();
 
-    model.bind("saved", function() {
+    model.bind("created", function() {
 
       view.el.empty();
       customers.add(model);
       router.displayMessage("Customer was added");
+      router.navigate("customers");
+
+    });
+  },
+
+  edit: function(customer) {
+
+    var router = this;
+    var view = new App.Views.EditCustomer({el: $("#subcontent"), model: customer});
+
+    this.clearMessage();
+
+    customer.bind("updated", function() {
+
+      view.el.empty();
+      router.displayMessage("Customer was updated");
       router.navigate("customers");
 
     });

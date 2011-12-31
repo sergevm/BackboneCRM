@@ -5,3 +5,7 @@
  *= require_self
  *= require_tree . 
 */
+.information {
+  color: darkblue;
+  font-size:smaller;
+}
