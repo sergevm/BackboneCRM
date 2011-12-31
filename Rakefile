@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-ProjectManagement::Application.load_tasks
+BackboneCRM::Application.load_tasks

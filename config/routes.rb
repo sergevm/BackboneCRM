@@ -1,4 +1,4 @@
-ProjectManagement::Application.routes.draw do
+BackboneCRM::Application.routes.draw do
   get "home/index"
 
   resources :projects
