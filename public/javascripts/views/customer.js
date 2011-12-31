@@ -6,9 +6,19 @@ App.Views.Customers = Backbone.View.extend({
 
     this.collection.bind("add", this.add, this);
     this.collection.bind("reset", this.addAll, this);
-    this.collection.bind("destroy", this.showMessage, this);
+    this.collection.bind("destroy", this.destroy, this);
 
-    this.render();
+   this.render();
+
+  },
+
+  events: {
+    "click #create"                           :"create"
+  },
+
+  displayMessage: function(message) {
+  
+   var view = new App.Views.Message({message: message});
 
   },
 
@@ -21,24 +31,66 @@ App.Views.Customers = Backbone.View.extend({
 
   add: function(customer) {
 
-    var list = this;
-
     var view = new App.Views.Customer({model: customer});
     
     view.bind("edit", function(customer){
-     list.trigger("edit", customer); 
-    }, view);
+      this.edit(customer);
+    }, this);
     
     this.$("#customer-table-body").append(view.el);
 
   },
 
-  showMessage: function(customer) {
+  edit: function(customer) {
+      
+    var list = this;
+    var view = new App.Views.EditCustomer({model: customer});
 
-    var message = new App.Views.Message({
-      el: $("#message"),
-      message: "Customer was removed"
-    });
+    view.bind("cancel", function() {
+
+      $(this.el).empty();
+      list.displayMessage("Edit of customer has been cancelled");
+    
+    });    
+
+    customer.bind("updated", function() {
+    
+      $(this.el).empty();
+      list.displayMessage("The customer has been updated successfully");
+
+    }, view);
+
+  },
+
+  create: function(ev) {
+    
+    var list = this;
+    var customer = new App.Models.Customer();
+    var view = new App.Views.EditCustomer({model: customer});
+
+    view.bind("cancel", function() {
+
+      $(this.el).empty();
+      list.displayMessage("Creation of customer has been cancelled");
+    
+    });    
+
+    customer.bind("created", function() {
+    
+      list.collection.add(this.model);
+      $(this.el).empty();
+      list.displayMessage("The customer has been created successfully");
+
+    }, view);
+
+   ev.preventDefault();
+    console.log("create");
+
+  },
+
+  destroy: function(customer) {
+    
+    this.displayMessage("The customer has been removed successfully");
 
   },
 
@@ -97,6 +149,8 @@ App.Views.Customer = Backbone.View.extend({
 
 App.Views.EditCustomer = Backbone.View.extend({
 
+  el: "#subcontent",
+
   events: {
     "submit #customer-form"             :"save",
     "click input:button"                :"cancel"
@@ -111,13 +165,13 @@ App.Views.EditCustomer = Backbone.View.extend({
   render: function() {
 
     $(this.el).append(JST.edit_customer({model: this.model}));
-    this.delegateEvents();
+    return this;
 
   },
 
   save: function(ev) {
 
-    var el = this.el;
+    var el = $(this.el);
     var isNew = this.model.isNew();
 
     this.model.save({name: this.$("[name=name]").val(), 
@@ -137,8 +191,6 @@ App.Views.EditCustomer = Backbone.View.extend({
 
   cancel: function(){
     
-    this.el.unbind();
-    this.el.empty();
     this.trigger("cancel");
 
   }
