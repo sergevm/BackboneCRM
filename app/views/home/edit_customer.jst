@@ -3,6 +3,6 @@
   <input name='name' type='text' value='<%= model.get('name') %>'/>
   <label for='legal_form'>Legal Form</label>
   <input name='legal_form' type='text' value='<%= model.get('legal_form') %>'/>
-  <button><%= model.isNew() ? 'Create' : 'Save' %></button>
+  <button id="submitButton"><%= model.isNew() ? 'Create' : 'Save' %></button>
   <input type="button" value="Cancel" id="cancelButton" />
 </form>

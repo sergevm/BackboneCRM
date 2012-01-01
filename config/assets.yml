@@ -8,3 +8,9 @@ javascripts:
     - public/javascripts/models/*.js
     - public/javascripts/**/*.js
     - app/views/**/*.jst
+  jquery:
+    - public/javascripts/jquery-ui-1.8.16.custom.js
+
+stylesheets:
+  jquery: 
+    - public/stylesheets/jquery-ui-1.8.16.custom.css

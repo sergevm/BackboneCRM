@@ -8,6 +8,32 @@ App.Views.Customers = Backbone.View.extend({
     this.collection.bind("reset", this.addAll, this);
     this.collection.bind("destroy", this.destroy, this);
 
+    var list = this;
+    
+   $(function() {
+
+      var dialog = $("#dialogcontent")
+                .dialog({
+                  autoOpen: false,
+                  title: "Create a customer",
+                  modal: true,
+                  width: 700,
+                  height: 100,
+                  close: function(event, ui) {
+                    $("#dialogcontent").empty();
+                  }
+                });
+
+      $("#create").click(function() {
+
+        list.create(list, dialog);
+        dialog.dialog('open');    
+        return false;
+
+      });
+
+   });
+
    this.render();
 
   },
@@ -44,7 +70,7 @@ App.Views.Customers = Backbone.View.extend({
   edit: function(customer) {
       
     var list = this;
-    var view = new App.Views.EditCustomer({model: customer});
+    var view = new App.Views.EditCustomer({el: $("#subcontent"), model: customer});
 
     view.bind("cancel", function() {
 
@@ -62,15 +88,15 @@ App.Views.Customers = Backbone.View.extend({
 
   },
 
-  create: function(ev) {
+  create: function(list, dialog) {
     
-    var list = this;
     var customer = new App.Models.Customer();
-    var view = new App.Views.EditCustomer({model: customer});
+    var view = new App.Views.EditCustomer({el: $("#dialogcontent"), model: customer});
 
     view.bind("cancel", function() {
 
       $(this.el).empty();
+      dialog.dialog("close");
       list.displayMessage("Creation of customer has been cancelled");
     
     });    
@@ -79,12 +105,10 @@ App.Views.Customers = Backbone.View.extend({
     
       list.collection.add(this.model);
       $(this.el).empty();
+      dialog.dialog("close");
       list.displayMessage("The customer has been created successfully");
 
     }, view);
-
-   ev.preventDefault();
-    console.log("create");
 
   },
 
@@ -106,7 +130,7 @@ App.Views.Customer = Backbone.View.extend({
 
   tagName:"tr",
 
-  className:"customer-row",
+  className:"customer-row ui-widget",
 
   events: {
     "dblclick td.customer-cell"             :"edit",
@@ -149,8 +173,6 @@ App.Views.Customer = Backbone.View.extend({
 
 App.Views.EditCustomer = Backbone.View.extend({
 
-  el: "#subcontent",
-
   events: {
     "submit #customer-form"             :"save",
     "click input:button"                :"cancel"
@@ -165,6 +187,7 @@ App.Views.EditCustomer = Backbone.View.extend({
   render: function() {
 
     $(this.el).append(JST.edit_customer({model: this.model}));
+    $("input:button, button").button();
     return this;
 
   },
@@ -191,6 +214,7 @@ App.Views.EditCustomer = Backbone.View.extend({
 
   cancel: function(){
     
+    $(this.el).unbind();    
     this.trigger("cancel");
 
   }
