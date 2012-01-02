@@ -12,26 +12,25 @@ App.Views.Customers = Backbone.View.extend({
     
    $(function() {
 
-      var dialog = $("#dialogcontent")
+      $("#create").click(function() {
+
+        // TODO: I think it might be more performant to reuse the 
+        // dialog. Will do for now, will look at it later on ...
+        var dialog = $("#dialogcontent")
                 .dialog({
                   autoOpen: false,
-                  title: "Create a customer",
                   modal: true,
-                  width: 700,
                   height: 100,
-                  close: function(event, ui) {
-                    $("#dialogcontent").empty();
-                  }
-                });
-
-      $("#create").click(function() {
+                  width: 700,
+                  title: "Create a customer",
+                  close: function() {$("#dialogcontent").empty();}
+               });
 
         list.create(list, dialog);
         dialog.dialog('open');    
         return false;
 
       });
-
    });
 
    this.render();
@@ -59,6 +58,9 @@ App.Views.Customers = Backbone.View.extend({
 
     var view = new App.Views.Customer({model: customer});
     
+    // Container view is in charge of displaying a view for editing 
+    // underneath the table that shows all customers. Another option 
+    // might be to have this handled by the row view of a customer?
     view.bind("edit", function(customer){
       this.edit(customer);
     }, this);
@@ -74,6 +76,7 @@ App.Views.Customers = Backbone.View.extend({
 
     view.bind("cancel", function() {
 
+      // Clear the zone under the table where editing is happening
       $(this.el).empty();
       list.displayMessage("Edit of customer has been cancelled");
     
@@ -81,6 +84,7 @@ App.Views.Customers = Backbone.View.extend({
 
     customer.bind("updated", function() {
     
+      // Clear the zone under the table where editing is happening
       $(this.el).empty();
       list.displayMessage("The customer has been updated successfully");
 
@@ -95,17 +99,20 @@ App.Views.Customers = Backbone.View.extend({
 
     view.bind("cancel", function() {
 
-      $(this.el).empty();
-      dialog.dialog("close");
+      $(view.el).empty();
+      dialog.dialog("destroy");
       list.displayMessage("Creation of customer has been cancelled");
     
     });    
 
     customer.bind("created", function() {
     
+      // Add the new customer to the collection. This will trigger rendering 
+      // of that customer via the add function
       list.collection.add(this.model);
-      $(this.el).empty();
-      dialog.dialog("close");
+
+      $(view.el).empty();
+      dialog.dialog("destroy");
       list.displayMessage("The customer has been created successfully");
 
     }, view);
@@ -134,7 +141,7 @@ App.Views.Customer = Backbone.View.extend({
 
   events: {
     "dblclick td.customer-cell"             :"edit",
-    "click #delete"                         :"remove"
+    "click #delete"                         :"destroy"
   },
 
   initialize: function() {
@@ -155,17 +162,66 @@ App.Views.Customer = Backbone.View.extend({
    this.trigger("edit", this.model); 
   },
 
-  remove: function(ev) {
+  destroy: function(ev) {
 
-    var view = this;
-    
-    this.model.destroy({
-      success: function(){
-        $(view.el).remove();
-      } 
+    // Prevent link navigation
+    ev.preventDefault();
+
+    // We need a reference inside of nested function calls
+    var row = this; 
+
+    var dialog = $("#dialogcontent").dialog({
+      height: 150,
+      width: 500,
+      modal: true,
+      title: "Confirmation",
+      close: function() {
+        $("#dialogcontent").empty();
+      },
+      buttons: [
+        {
+          text: "Ok",
+          click: function(){
+
+            row.model.destroy(
+              {
+                success: function(){
+                  // Remove the row from the table
+                  row.remove();
+                  // Clear the content of the div holding
+                  // the content. Mind that destroy of the 
+                  // dialog does not invoke the close callback
+                  // defined in the options above
+                  $("#dialogcontent").empty();
+                  // Destroy the dialog. Maybe I should 
+                  // reuse the dialog over the different 
+                  // views, and pass along options ????
+                  $("#dialogcontent").dialog("destroy");
+                }
+              }
+            );
+          }
+        },
+        {
+          text: "Cancel",
+          click: function() {
+            // Clear the content of the div holding
+            // the content. Mind that destroy of the 
+            // dialog does not invoke the close callback
+            // defined in the options above
+            $("#dialogcontent").empty();
+            // Destroy the dialog. Maybe I should 
+            // reuse the dialog over the different 
+            // views, and pass along options ????
+            $("#dialogcontent").dialog("destroy");
+          }
+        } 
+        ]
     });
 
-    ev.preventDefault();
+    $("#dialogcontent").append("<div>Are you sure you wish to remove '" + this.model.get('name') + "'?</div>");
+
+    dialog.dialog('open');
   }
 
 });
@@ -194,33 +250,46 @@ App.Views.EditCustomer = Backbone.View.extend({
 
   save: function(ev) {
 
+    // We need this information in callbacks
     var el = $(this.el);
     var isNew = this.model.isNew();
 
-    this.model.save({name: this.$("[name=name]").val(), 
-      legal_form: this.$("[name=legal_form]").val()},
-      {
-        success: function(model,response){
-          model.trigger(isNew ? "created": "updated");
-          el.unbind();
+    this.model.save(
+        // These are the fields we're saving
+        {
+          name:       this.$("[name=name]").val(), 
+          legal_form: this.$("[name=legal_form]").val()
         },
-        error: function() {
+        // Callbacks for success or error
+        {
+          success: function(model,response){
+     
+            model.trigger(isNew ? "created": "updated");
+            el.unbind();
+     
+          },
+          error: function() {
+          // TODO: display the error appropriately
+          }
         }
-      }
     );
 
+    // No navigation
     ev.preventDefault(); 
   },
 
   cancel: function(){
     
+    // Make sure we're not don't stay bound to event handlers
     $(this.el).unbind();    
+    // Notify the container view that the edit has been cancelled
     this.trigger("cancel");
 
   }
 
 });
 
+// This is a small view over the div that displays messages
 App.Views.Message = Backbone.View.extend({
 
   el: "#message",
